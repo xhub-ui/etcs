@@ -148,7 +148,6 @@ return function(Page, API)
         teleportLocations = {}
         saveToDisk()
         notify("System", "All locations cleared.", 2)
-        -- Perlu refresh list, kita buat fungsi refresh di bawah
     end, false)
 
     -- SECTION 3: LIST DISPLAY
@@ -163,7 +162,7 @@ return function(Page, API)
     listLabel.LayoutOrder = 3
 
     local locationsFrame = Instance.new("Frame", mainScrollFrame)
-    locationsFrame.Size = UDim2.new(0.98, 0, 0, 0) -- Auto size handled manually or by list layout
+    locationsFrame.Size = UDim2.new(0.98, 0, 0, 0)
     locationsFrame.BackgroundTransparency = 1
     locationsFrame.LayoutOrder = 4
 
@@ -222,16 +221,11 @@ return function(Page, API)
             -- TP Logic
             tpBtn.MouseButton1Click:Connect(function()
                 if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    -- Parsing CFrame if saved as table or using directly
                     local cf
                     if typeof(pos) == "CFrame" then cf = pos
                     elseif typeof(pos) == "table" then 
-                         -- Simple parser assuming array {x,y,z,...} or similar
                          cf = CFrame.new(unpack(pos))
                     end
-                    
-                    -- Fallback simple teleport if data structure is complex
-                    -- (For this example, assumes we save components)
                     if cf then 
                         player.Character.HumanoidRootPart.CFrame = cf 
                     else
@@ -248,9 +242,9 @@ return function(Page, API)
             end)
         end
         
-        -- Resize container based on count
+        -- Resize container
         locationsFrame.Size = UDim2.new(0.98, 0, 0, count * 34)
-        mainScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 200 + (count * 34))
+        mainScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 220 + (count * 34))
     end
 
     -- Hook up Save Button
@@ -269,17 +263,13 @@ return function(Page, API)
             notify("Success", "Location saved: " .. name, 2)
         end
     end)
-    
-    -- Hook up Free Clear Button (from above logic)
-    -- Re-bind the callback to include refreshList since it was defined before
+
+    -- Hook up Clear Button Refresher
     for _, btn in pairs(fileSection:GetChildren()) do
         if btn:IsA("TextButton") and btn.Text == "Clear All Locations" then
-            btn.MouseButton1Click:Connect(function()
-                 refreshList() -- Updates UI after clearing
-            end)
+            btn.MouseButton1Click:Connect(function() refreshList() end)
         end
     end
 
-    -- Initial Display
     refreshList()
 end
